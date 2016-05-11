@@ -1,0 +1,188 @@
+\documentclass[a4paper]{article}
+
+\usepackage{a4wide,times}
+\usepackage[english]{babel}
+% -----------------------------------------------
+% especially use this for you code
+% -----------------------------------------------
+
+\usepackage{courier}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{mathtools}
+
+\definecolor{Gray}{gray}{0.95}
+
+\lstset{ %
+	language = C,                   % choose the language of the code
+	basicstyle = \small\ttfamily,   % the size and fonts that are used
+	frame = single,                 % adds a frame around the code
+	tabsize = 3,                    % sets default tabsize
+	breaklines = true,              % sets automatic line breaking
+	numbers = left,                 % where to put the line-numbers
+	numberstyle = \footnotesize,    % the style of the line-numbers
+	backgroundcolor = \color{Gray}  % the background color of the listing
+}
+% This is the list style for displaying input/output. It is different from the style above, since you don't need C keywords to be highlighted in these listings. Line numbers are also emitted in this style.
+% This is the list style for displaying C source code:
+\lstdefinestyle{code}{
+    language = C,					% The language of the code snippets
+    basicstyle = \small\ttfamily,	% Font of the text
+    numbers = left,					% Position of the line numbers
+    numberstyle = \footnotesize,	% Style of line numbers
+    frame = tb,				        % Style of surrounding frame
+    framextopmargin=.75mm,         % Space margin top
+    framexbottommargin=.75mm,      % Space margin bottom
+    framexleftmargin=2mm,          % Space margin left
+    framexrightmargin=2mm,         % Space margin right
+    tabsize = 3,					% Size of tab character
+    breaklines = true,             % Wrap lines of code that are too long
+    columns = fullflexible,			
+    showstringspaces = false,
+    backgroundcolor = \color{Gray}
+}
+
+\lstdefinestyle{stdio}{
+    basicstyle = \small\ttfamily,	% Font of the text
+    frame = tb,				        % Style of the surrounding frame
+    framextopmargin=.75mm,         % Space margin top
+    framexbottommargin=.75mm,      % Space margin bottom
+    framexleftmargin=2mm,          % Space margin left
+    framexrightmargin=2mm,         % Space margin right
+    tabsize = 3,					% Size of tab character
+    breaklines = true,             % Wrap lines of text that are too long
+    columns = flexible,			
+    showstringspaces = false,
+    backgroundcolor = \color{Gray}
+}
+% -- until here ---------------------------------
+
+\begin{document}
+
+
+\title{Artificial Intelligence I\\
+Programming report \\
+assignment 1 
+}
+
+\date{\today}
+
+\author{E.Bier \quad A.Roorda\\
+s3065979 \quad s2973782\\
+Lab Group: CS1
+}
+
+\maketitle
+
+\section{Theory Questions}
+\begin{enumerate}
+\item PEAS description
+\begin{enumerate}
+\item Reversi:
+\begin{itemize}
+\item Performance Measure: Number of right colored pieces.
+\item Environment: Reversi Board.
+\item Actuators: Placing pieces.
+\item Sensors: Observe board position.
+\item Other characteristics: fully observable, deterministic, sequential, static, discrete, multi-agent. Because the program only needs to look at the current scenario to make a decision, the best architecture for this agent is the Simple Reflex Agent.
+\end{itemize}
+\item Robot lawn mower:
+\begin{itemize}
+\item Performance Measure: Area of grass with acceptable length.
+\item Environment: Yard.
+\item Actuators: Grass cutter, wheels.
+\item Sensors: Camera, distance sensor, obstacle sensor,
+\item Other characteristics: partially observable, stochastic, sequential, dynamic, continuous, multi-agent. This agent should be designed as a model-based goal-based agent, since it needs to track how the world looks at the moment of the decision. This includes tracking wherever it's recently been through, checking how long the grass is, etc.
+\end{itemize}
+\end{enumerate}
+\item Maze
+\begin{enumerate}
+\item The mazeDFS() is unable to find a path between the yellow and red squares because it gets stuck switching between squares 14 and 10. The reason for that is the fixed that is being used to choose the movements. Whenever the algorithm can't go north or east, it will go to the south or to the west. In case it does go south, the next movement will clearly be to the north and it'll be in the same situation as it is now.
+
+\item To fix this issue, the code should keep track of the locations it has visited.
+\begin{lstlisting}[style = stdio]
+procedure mazeDFS(maze, start, goal):
+stack = []
+stack.push(start)
+while stack is not empty:
+   start.visited = true
+   loc = stack.pop()
+   if loc == goal:
+     print "Goal found"
+     return
+   for move in [N,E,S,W]: # in this order!          
+     if allowedMove(loc, move) and not neighbour(maze, loc, move).visited:
+        stack.push(neighbour(maze, loc, move))
+print "Goal not found"
+\end{lstlisting}
+\item The algorithm takes the following path for that call: \\
+$
+1 \xrightarrow{} 2 \xrightarrow{} 6 \xrightarrow{} 5 \xrightarrow{} 9 \xrightarrow{} 13 \xrightarrow{} 14 \xrightarrow{} 10 \xrightarrow{} 7 \xrightarrow{} 3 \xrightarrow{} 4 \xrightarrow{} 8 \xrightarrow{} 12 \xrightarrow{} 11 \xrightarrow{} 15
+$
+
+\item If we change the order of visiting neighbors we have the following path: \\
+$
+1 \xrightarrow{} 2 \xrightarrow{} 6 \xrightarrow{} 7 \xrightarrow{} 3 \xrightarrow{} 4 \xrightarrow{} 8 \xrightarrow{} 12 \xrightarrow{} 11 \xrightarrow{} 15
+$
+
+\item The algorithm will always find a solution in that case because it will end up visiting all reachable states (until it finds the solution). All of the discovered states are added to the queue, so the algorithm is always moving forward, although it will visit the same states a lot of times.
+
+\item The states would be visited in the following order (repeating states are omitted):\\
+$
+1 \xrightarrow{} 2 \xrightarrow{} 6 \xrightarrow{} 7 \xrightarrow{} 5 \xrightarrow{} 3 \xrightarrow{} 9 \xrightarrow{} 4 \xrightarrow{} 8 \xrightarrow{} 13 \xrightarrow{} 12 \xrightarrow{} 14 \xrightarrow{} 11 \xrightarrow{} 10 \xrightarrow{} 15
+$
+
+\item It is possible to reduce the number of visited states in the BFS algorithm. To do so, the algorithm should keep track of visited states so it doesn't have to go through them again.
+
+\begin{lstlisting}[style = stdio]
+procedure mazeBFS(maze, start, goal):
+queue = []
+queue.enqueue(start)
+while queue is not empty:
+   start.visited = true
+   loc = queue.dequeue()
+   if loc == goal:
+     print "Goal found"
+     return
+   for move in [N,E,S,W]: # in this order!          
+     if allowedMove(loc, move) and not neighbour(maze, loc, move).visited:
+        queue.enqueue(neighbour(maze, loc, move))
+print "Goal not found"
+\end{lstlisting}
+\item For large mazes, I would use a variation of the  BFS algorithm. This algorithm always yields the shortest path, since it explores all branches at the same time, whereas the DFS algorithm may not give you the optimal solution because it may choose to explore first a branch that contains a very long path to the goal, when a short one does exist. Note that DFS and BFS have very similar running times, so there are no clear disadvantages to picking BFS over DFS.
+\end{enumerate}
+\end{enumerate}
+
+\section{Programming Assignment}
+\subsection{Answers}
+
+\begin{enumerate}
+\item The program runs out of memory for the 0 100 call but not for the 0 99 and 0 102 calls. The reason for that is the fact that 99 and 102 are both multiples of 3 and therefore are much easier to reach and are not so deep in the search. On the other hand, the path to 100 is considerably longer which makes the number of states in the fringe way bigger. As for the path from 1 to 0 and 0 to 1 using DFS, the algorithm is runs out of memory for the 0 to 1 case because it gets stuck on 0 forever since the last item on the stack is always $0 \xrightarrow{*3} 0$.
+
+\item The algorithm is much quicker now since it does not repeat previously visited states and does not change to states that will bring it further from the goal.
+
+\addtocounter{enumi}{2}
+\item The optimal path from 0 to 42 are: \\
+$
+0 \xrightarrow{+1} 1 \xrightarrow{+1} 2 \xrightarrow{*3} 6 \xrightarrow{+1} 7 \xrightarrow{*2} 14 \xrightarrow{*3} 42 \\
+0 \xrightarrow{+1} 1 \xrightarrow{+1} 2 \xrightarrow{*3} 6 \xrightarrow{+1} 7 \xrightarrow{*3} 21 \xrightarrow{*2} 42 
+$
+
+\addtocounter{enumi}{1}
+\item The IDS algorithm usually ends up visiting a large number of states and always provides the shortest path. Both BFS and DFS visit a similar number of states but sometimes, for specific inputs, end up visiting a lot of states. The priority implementation, on the other hand, seems to be really efficient, always providing the shortest path and visiting a reasonable, albeit sometimes slightly larger, amount of states than the BFS and DFS.
+
+\item The two heuristics used for the A* algorithm use the same basic concept: The knight can always moves 3 positions \textbf{away} from it's current position in any shape. The first heuristic uses this by determining the amount of moves to get to the positions near (6 cell radius) the knight. The second heuristic expands on the first one by (under)estimating the amount of movements on positions further away from it. This estimation is done using the manhattan distance and the fact that the knight would only be able to get 3 blocks closer to its goal per move. It's clear to see that the second heuristic does a much better job than the first one, since the estimations on the second one are much closer to reality. As so, the first heuristic has a branching factor of 4.585463, while for the second one it's 4.010053.
+
+\end{enumerate}
+
+\subsection{Code}
+\lstinputlisting[caption={fringe.c}, style = code]{src/fringe.c}
+
+\lstinputlisting[caption={search.c}, style = code]{src/search.c}
+
+\lstinputlisting[caption={ids.c}, style = code]{src/ids.c}
+
+\lstinputlisting[caption={astar.c}, style = code]{src/astar.c}
+
+
+\end{document}
