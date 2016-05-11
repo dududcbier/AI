@@ -462,7 +462,7 @@ void geneticAlgorithm(){
   for (int i = 0; i < size; i++)
     populate(&population[i]);
 
-  while (evaluateState() != optimum && iter < 1000){
+  while (evaluateState() != optimum && iter < MAXITER){
     for (int i = 0; i < size; i++){
       Board child;
       int index = select(population, size, -1);
@@ -476,12 +476,19 @@ void geneticAlgorithm(){
 
       population[size-1] = child;
       insertSorted(population, size, child);
+
+      for (int j = 0; j < nqueens; j++)
+        queens[j] = population[0].queens[j];
     }
     iter++;
   }  
 
-  if (iter < 1000)
+  if (iter < MAXITER) {
+    printf ("Solved puzzle. ");
     solved++;
+  }
+  printf ("Final state is");
+  printState();
 }
 
 /*************************************************************/
