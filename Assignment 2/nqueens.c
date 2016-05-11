@@ -18,10 +18,8 @@ int queens[MAXQ]; /* queen at (r,c) is represented by queens[r] == c */
 int solved = 0;
 
 typedef struct board {
-
   int queens[11];
   int fitness;
-
 } Board;
 
 
@@ -315,6 +313,13 @@ void simulatedAnnealing() {
 
 /*************************************************************/
 
+void printBoard(Board *b){
+  printf("Address: %p\nBoard: ", b);
+  for (int i = 0; i < nqueens; i++)
+    printf("%d ", b->queens[i]);
+  printf("\nFitness: %d\n\n", b->fitness);
+}
+
 void reproduce(int *x, int *y, Board* child) {
   int c = 1 + rand() % (nqueens - 1);
   for (int i = 0; i < c; i++)
@@ -451,9 +456,20 @@ int cmpfunc(const void * a, const void * b){
    return ( (*board2).fitness - (*board1).fitness);
 }
 
+void isSorted(Board *b, int size){
+  for(int i = 0; i < size - 1; i++)
+    assert(b[i].fitness >= b[i + 1].fitness);
+}
+
+void printPopulation(Board *population, int size){
+  printf("---------------------------------\nPOPULATION:\n");
+  for(int i = 0; i < size; i++)
+    printBoard(&population[i]);
+}
+
 void geneticAlgorithm(){
 
-  int size = 10;
+  int size = 1000;
   Board population[size];
   int optimum = (nqueens-1)*nqueens/2;
   int iter = 0;
@@ -461,6 +477,8 @@ void geneticAlgorithm(){
 
   for (int i = 0; i < size; i++)
     populate(&population[i]);
+
+  qsort(population, size, sizeof(Board), cmpfunc);
 
   while (evaluateState() != optimum && iter < MAXITER){
     for (int i = 0; i < size; i++){
@@ -471,14 +489,17 @@ void geneticAlgorithm(){
 
       reproduce(x.queens, y.queens, &child);
 
-      if (rand() % 100 <= chance)
+      if (rand() % 1000 <= chance)
         mutate(child.queens);
 
       population[size-1] = child;
       insertSorted(population, size, child);
+      // isSorted(population, size);
 
-      for (int j = 0; j < nqueens; j++)
+
+      for (int j = 0; j < nqueens; j++){
         queens[j] = population[0].queens[j];
+      }
     }
     iter++;
   }  
@@ -493,18 +514,6 @@ void geneticAlgorithm(){
 
 /*************************************************************/
 
-void printBoard(Board *b){
-  printf("Address: %p\nBoard: ", b);
-  for (int i = 0; i < nqueens; i++)
-    printf("%d ", b->queens[i]);
-  printf("\nFitness: %d\n\n", b->fitness);
-}
-
-void checkSorting(Board *b, int size){
-  for(int i = 0; i < size - 1; i++)
-    assert(b[i].fitness >= b[i + 1].fitness);
-}
-
 int main(int argc, char *argv[]) {
   int algorithm;
   int repeat = 1;
@@ -518,13 +527,13 @@ int main(int argc, char *argv[]) {
   // populate(&y);
   // nqueens = 11;
   // qsort(boards, 10, sizeof(Board), cmpfunc);
-  // checkSorting(boards, 10);
+  // isSorted(boards, 10);
 
   // insertSorted(boards, 10, x);
-  // checkSorting(boards, 10);
+  // isSorted(boards, 10);
 
   // insertSorted(boards, 10, y);
-  // checkSorting(boards, 10);
+  // isSorted(boards, 10);
 
   // printf("Sorting working\n");
 
@@ -552,9 +561,9 @@ int main(int argc, char *argv[]) {
 
     switch (algorithm) {
     case 1: randomSearch();       break;
-    case 2: hillClimbing(5);       break;
+    case 2: hillClimbing(5);      break;
     case 3: simulatedAnnealing(); break;
-    case 4: geneticAlgorithm(); break;
+    case 4: geneticAlgorithm();   break;
     }
   }
   printf("Solved %.1f%%\n", ((float) solved / repeat) * 100);
