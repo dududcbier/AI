@@ -202,24 +202,24 @@ void randomSearch() {
 
 /*************************************************************/
 
-void calculateNeighborsHC(int *neighbors, int queen){
-  for (int pos = 0; pos < nqueens; pos++){
+void calculateNeighborsHC(int *neighbors, int queen) {
+  for (int pos = 0; pos < nqueens; pos++) {
     moveQueen(queen, pos);
     neighbors[pos] = evaluateState();
   }
 }
 
-int bestNeighbor(int queen){
+int bestNeighbor(int queen) {
   int neighbors[MAXQ];
   int best = -1;
   int sameValue[MAXQ], sizeSameValue = 0;
   calculateNeighborsHC(neighbors, queen);
-  for (int i = 0; i < nqueens; i++){
-    if (neighbors[i] > best){
+  for (int i = 0; i < nqueens; i++) {
+    if (neighbors[i] > best) {
       best = neighbors[i];
       sizeSameValue = 0;
     }
-    if (neighbors[i] == best){
+    if (neighbors[i] == best) {
       sameValue[sizeSameValue] = i;
       sizeSameValue++;
     }
@@ -234,12 +234,12 @@ void hillClimbing(int limit) {
   int eval;
 
     /* generate new, better state: for each queen do ...*/
-    for (queen=0; queen < nqueens; queen++) {
-      int newpos;
-      /* change to one of the best neighbors */
-      newpos = bestNeighbor(queen);
-      moveQueen(queen, newpos);
-    }
+  for (queen=0; queen < nqueens; queen++) {
+    int newpos;
+    /* change to one of the best neighbors */
+    newpos = bestNeighbor(queen);
+    moveQueen(queen, newpos);
+  }
 
   eval = evaluateState();
   if (eval == optimum) {
@@ -252,7 +252,7 @@ void hillClimbing(int limit) {
   printState();
 
   // Try again using the final state as initial state?
-  if (eval != optimum && limit > 0){
+  if (eval != optimum && limit > 0) {
     initiateQueens(1);
     hillClimbing(limit - 1);
   }
@@ -261,11 +261,11 @@ void hillClimbing(int limit) {
 
 /*************************************************************/
 
-float T(int t){
+float T(int t) {
   return 100 * pow(0.95, t);
 }
 
-double P(int deltaE, float temperature){
+double P(int deltaE, float temperature) {
   return exp(deltaE / temperature) * ((double) RAND_MAX + 1.0);
 }
 
@@ -276,30 +276,36 @@ void simulatedAnnealing() {
   int current, deltaE, eval;
   int optimum = (nqueens-1)*nqueens/2;
 
-  for (t = 0; TRUE; t++){
+  for (t = 0; TRUE; t++) {
+    int new;
     temperature = T(t);
 
     if (temperature <= 0)
       break;
 
+    // Picking a random neighbor
     nextQueen = random() % nqueens;
     nextPos = random() % nqueens;
-
     oldPos = queens[nextQueen];
     while (oldPos == nextPos)
       nextPos = random() % nqueens;
 
     current = evaluateState();
     moveQueen(nextQueen, nextPos);
-    deltaE = evaluateState() - current;
+    new = evaluateState();
+    deltaE = new - current;
+
+    // Stop if a solution was reached
+    if (new == optimum){
+      eval = new;
+      break;
+    }
 
     // Undo the move if it's not a good move, but only with probability 1 - e^(deltaE / temperature)
-    if (deltaE <= 0 && rand() > P(deltaE, temperature)){
+    if (deltaE <= 0 && rand() > P(deltaE, temperature))
       moveQueen(nextQueen, oldPos);
-    }
   }
 
-  eval = evaluateState();
   if (eval == optimum) {
     printf ("Solved puzzle. ");
     solved++;
@@ -311,9 +317,17 @@ void simulatedAnnealing() {
 
 }
 
+int timeToTemperature(float temp){
+  int cont = 0;
+
+  for (int cont; TRUE; cont++)
+    if (T(cont) == temp)
+      return cont;
+}
+
 /*************************************************************/
 
-void printBoard(Board *b){
+void printBoard(Board *b) {
   printf("Address: %p\nBoard: ", b);
   for (int i = 0; i < nqueens; i++)
     printf("%d ", b->queens[i]);
@@ -331,42 +345,42 @@ void reproduce(int *x, int *y, Board* child) {
   child->fitness = evaluateBoard(child->queens);
 }
 
-void swapPermutation(int *x, int left, int right){
+void swapPermutation(int *x, int left, int right) {
   int aux;
   aux = x[left];
   x[left] = x[right];
   x[right] = aux;
 }
 
-void shiftPermutation(int *x, int left, int right){
+void shiftPermutation(int *x, int left, int right) {
   for (int i = right; i > left + 1; i--)
     swapPermutation(x, i - 1, i);
 }
 
-void reversalMutation(int *x, int left, int right){
+void reversalMutation(int *x, int left, int right) {
   while (left < right)
     swapPermutation(x, left++, right--);
 }
 
-void scrambleMutation(int *x, int left, int right){
+void scrambleMutation(int *x, int left, int right) {
   if (right != left)
-    for (int i = left; i < right + 1; i++){
+    for (int i = left; i < right + 1; i++) {
       int r = left + rand() % (right - left);
       swapPermutation(x, i, r);
     }
 }
 
-void mutate(int *x){
+void mutate(int *x) {
   int left = rand() % nqueens;
   int right = rand() % nqueens;
 
-  if (left > right){
+  if (left > right) {
     int aux = right;
     right = left;
     left = aux;
   }
 
-  switch(rand() % 4){
+  switch(rand() % 4) {
     case 0: shiftPermutation(x, left, right); break;
     case 1: swapPermutation(x, left, right);  break;
     case 2: reversalMutation(x, left, right); break;
@@ -382,11 +396,11 @@ void populate(Board *pop) {
   pop->fitness = evaluateBoard(pop->queens);
 }
 
-int binarySearch(int *a, int size, int value){
+int binarySearch(int *a, int size, int value) {
   int low = 0;
   int high = size - 1;
 
-  while (low <= high){
+  while (low <= high) {
     int mid = (low + high) / 2;
 
     if (a[mid] >= value)
@@ -398,11 +412,11 @@ int binarySearch(int *a, int size, int value){
   return low;
 }
 
-int binarySearchBoard(Board *b, int size, int value){
+int binarySearchBoard(Board *b, int size, int value) {
   int low = 0;
   int high = size - 1;
 
-  while (low <= high){
+  while (low <= high) {
     int mid = (low + high) / 2;
 
     if (b[mid].fitness <= value)
@@ -414,14 +428,14 @@ int binarySearchBoard(Board *b, int size, int value){
   return low;
 }
 
-void insertSorted(Board *population, int size, Board new){
+void insertSorted(Board *population, int size, Board new) {
   // Position for board to be inserted
   int pos = binarySearchBoard(population, size, new.fitness);
 
   population[size - 1] = new;
 
   // Shifting to the right position
-  for (int i = size - 1; i > pos; i--){
+  for (int i = size - 1; i > pos; i--) {
     Board aux = population[i - 1];
     population[i - 1] = population[i];
     population[i] = aux;
@@ -431,7 +445,7 @@ void insertSorted(Board *population, int size, Board new){
 
 // Returns the position of a certain (random) board. Boards with higher values
 // have better odds to be selected.
-int select(Board *population, int size, int ignore){
+int select(Board *population, int size, int ignore) {
 
   int accumulatedFitness[size];
   int r;
@@ -448,7 +462,7 @@ int select(Board *population, int size, int ignore){
   return binarySearch(accumulatedFitness, size, r);
 }
 
-int cmpfunc(const void * a, const void * b){
+int cmpfunc(const void * a, const void * b) {
    const void *left = (const void **) a;
    const void *right = (const void **) b;
    const Board *board1 = left;
@@ -456,18 +470,18 @@ int cmpfunc(const void * a, const void * b){
    return ( (*board2).fitness - (*board1).fitness);
 }
 
-void isSorted(Board *b, int size){
+void isSorted(Board *b, int size) {
   for(int i = 0; i < size - 1; i++)
     assert(b[i].fitness >= b[i + 1].fitness);
 }
 
-void printPopulation(Board *population, int size){
+void printPopulation(Board *population, int size) {
   printf("---------------------------------\nPOPULATION:\n");
   for(int i = 0; i < size; i++)
     printBoard(&population[i]);
 }
 
-void geneticAlgorithm(){
+void geneticAlgorithm() {
 
   int size = 1000;
   Board population[size];
@@ -480,8 +494,8 @@ void geneticAlgorithm(){
 
   qsort(population, size, sizeof(Board), cmpfunc);
 
-  while (evaluateState() != optimum && iter < MAXITER){
-    for (int i = 0; i < size; i++){
+  while (evaluateState() != optimum && iter < MAXITER) {
+    for (int i = 0; i < size; i++) {
       Board child;
       int index = select(population, size, -1);
       Board x = population[index];
@@ -497,7 +511,7 @@ void geneticAlgorithm(){
       // isSorted(population, size);
 
 
-      for (int j = 0; j < nqueens; j++){
+      for (int j = 0; j < nqueens; j++) {
         queens[j] = population[0].queens[j];
       }
     }
@@ -553,7 +567,7 @@ int main(int argc, char *argv[]) {
   
   initializeRandomGenerator();
 
-  for (int i = 0; i < repeat; i++){
+  for (int i = 0; i < repeat; i++) {
     initiateQueens(1);
     
     printf("\nInitial state:");
@@ -561,7 +575,7 @@ int main(int argc, char *argv[]) {
 
     switch (algorithm) {
     case 1: randomSearch();       break;
-    case 2: hillClimbing(5);      break;
+    case 2: hillClimbing(7);      break;
     case 3: simulatedAnnealing(); break;
     case 4: geneticAlgorithm();   break;
     }
