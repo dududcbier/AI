@@ -321,7 +321,7 @@ int timeToTemperature(float temp){
   int cont = 0;
 
   for (int cont; TRUE; cont++)
-    if (T(cont) == temp)
+    if (T(cont) <= temp)
       return cont;
 }
 
