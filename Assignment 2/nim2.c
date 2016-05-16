@@ -13,7 +13,7 @@ typedef struct move {
 
 Move negaMax(int state, int turn) {
   Move best;
-  best.valuation = -INFINITY;
+  best.valuation = INFINITY;
   best.move = -10;
 
   if (state == 1) {
@@ -24,10 +24,10 @@ Move negaMax(int state, int turn) {
   for (int move = 1; move <= 3; move++) {
     if (state - move > 0) {
       Move m = negaMax(state - move, 1 - turn);
-      if (m.valuation != -INFINITY)
+      if (m.valuation != INFINITY)
         m.valuation *= -1;
 
-      if (m.valuation > best.valuation) {
+      if (m.valuation < best.valuation) {
         best.valuation = m.valuation;
         best.move = move;
       }
