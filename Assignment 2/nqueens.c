@@ -18,7 +18,7 @@ int queens[MAXQ]; /* queen at (r,c) is represented by queens[r] == c */
 int solved = 0;
 
 typedef struct board {
-  int queens[11];
+  int queens[MAXQ];
   int fitness;
 } Board;
 
@@ -262,7 +262,7 @@ void hillClimbing(int limit) {
 /*************************************************************/
 
 float T(int t) {
-  return 100 * pow(0.95, t);
+  return 10000000 * pow(0.95, t);
 }
 
 double P(int deltaE, float temperature) {
@@ -481,21 +481,22 @@ void printPopulation(Board *population, int size) {
     printBoard(&population[i]);
 }
 
+#define MAXITER_GA 100
 void geneticAlgorithm() {
 
   int size = 1000;
   Board population[size];
   int optimum = (nqueens-1)*nqueens/2;
   int iter = 0;
-  int chance = 1;
+  int chance = 2;
 
   for (int i = 0; i < size; i++)
     populate(&population[i]);
 
   qsort(population, size, sizeof(Board), cmpfunc);
 
-  while (evaluateState() != optimum && iter < MAXITER) {
-    for (int i = 0; i < size; i++) {
+  while (evaluateState() != optimum && iter < MAXITER_GA) {
+    for (int i = 0; i < size / 2; i++) {
       Board child;
       int index = select(population, size, -1);
       Board x = population[index];
@@ -506,24 +507,22 @@ void geneticAlgorithm() {
       if (rand() % 1000 <= chance)
         mutate(child.queens);
 
-      population[size-1] = child;
       insertSorted(population, size, child);
       // isSorted(population, size);
-
-
-      for (int j = 0; j < nqueens; j++) {
-        queens[j] = population[0].queens[j];
-      }
     }
+    for (int j = 0; j < nqueens; j++) {
+        queens[j] = population[0].queens[j];
+    }
+    printf("%d ", iter);
     iter++;
   }  
 
-  if (iter < MAXITER) {
+  if (iter < MAXITER_GA) {
     printf ("Solved puzzle. ");
+    printState();
     solved++;
   }
-  printf ("Final state is");
-  printState();
+  else printf("Solution not found\n");
 }
 
 /*************************************************************/
@@ -570,8 +569,8 @@ int main(int argc, char *argv[]) {
   for (int i = 0; i < repeat; i++) {
     initiateQueens(1);
     
-    printf("\nInitial state:");
-    printState();
+    // printf("\nInitial state:");
+    // printState();
 
     switch (algorithm) {
     case 1: randomSearch();       break;
