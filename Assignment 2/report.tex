@@ -1,0 +1,241 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{enumerate}
+\usepackage{color}
+\usepackage{amsmath}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{language=C,
+  numbers=left,
+  stepnumber=1,    
+  firstnumber=1,
+  numberfirstline=true
+  aboveskip=5mm,
+  belowskip=5mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true
+  tabsize=3
+}
+
+\title{Artificial Intelligence 1 \\ Lab 2}%Update the lab (assignment number)
+\author{Eduardo Bier s3065979 \& Auke Roorda s2973782 \\ CS1} %Change the names and fill in the student numbers and the group name (AI1/AI2/CS1 etc)
+\date{May 15, 2016}%Update the date
+
+\begin{document}
+
+\maketitle
+
+\section*{Theory}
+\subsection*{Hill Climbing}
+%Your answers for the theoretical questions go here
+
+\begin{enumerate}
+\item The algorithm is unable to solve the problem most of the time, even for a small number of queens. As shown by Table \ref{table:solvedHC}, the algorithm's ability to solve the problem quickly drops as the number of queens rises, reaching a point where it is extremely unlikely to solve it. 
+
+\begin{table}[ht]
+	\resizebox{1.0\textwidth}{!}{\begin{minipage}{\textwidth}
+    \centering
+	\begin{tabular}{ c | c }
+  		number of queens & solved puzzles \\ \hline
+  		4 & 26.5\% \\
+        6 & 4.4\% \\
+  		8 & 3.7\% \\
+        11 & 0.6\% \\
+        12 & 0.4\% \\
+  		16 & 0.0\% \\
+        32 & 0.0\% \\
+	\end{tabular}
+	\caption[Table caption text]{Percentage of solved puzzles vs number of queens.}
+\label{table:solvedHC}
+\end{minipage} }
+\end{table}
+
+\item The algorithm does not solve the problem when it chooses a wrong position for one of the queens. The number of wrong positions clearly rises as the number of queens rises, so it makes mistakes more often. In other words, the algorithm ends up getting stuck on local maximums and never reaches the global maximum. To fix this problem, if the algorithm does not find a solution it resets the board and tries again until a certain (arbitrary) limit is reached. This seems to work rather well, even for a small limit, as shown in Table \ref{table:solvedHC2}. However, for a large numbers of queens, the algorithm still struggles to find a solution.
+
+\item Table \ref{table:solvedHC2} shows the results after implementing the repetitions in the algorithm.
+\begin{table}[ht]
+	\resizebox{1.0\textwidth}{!}{\begin{minipage}{\textwidth}
+    \centering
+	\begin{tabular}{ c | c }
+  		number of queens & solved puzzles\\ \hline
+  		4 & 86.7\% \\
+        6 & 29.0\% \\
+  		8 & 27.3\% \\
+        11 & 4.7\% \\
+        12 & 3.6\% \\
+  		16 & 0.9\% \\
+        32 & 0.0\% \\
+	\end{tabular}
+	\caption[Table caption text]{Percentage of solved puzzles vs number of queens using a limit of 7 repetitions.}
+\label{table:solvedHC2}
+\end{minipage} }
+\end{table}
+
+\end{enumerate}
+
+\subsection*{Simulated Annealing}
+%Your answers for the theoretical questions go here
+\begin{enumerate}
+
+\item The simulated annealing algorithm was a pretty straight-forward adaptation of the pseudo-code. In order to pick a successor, all the algorithm does is pick a random queen and a new random position for it. In order not to be stuck in the same position, the new position of that queen is forced to be different from its current position. The pseudo-code was also modified so as to always move the queen and undo the move if it's not a good move and with probability $1 - e^{\frac{\Delta E}{T}}$. The reason for that was how the evaluateState() function worked, the state needed to be change in order to be evaluated, so it was needed to determine $\Delta E$.
+
+\item The function T(t) is responsible for how many times the algorithm does a bad move. If the temperature lowers too fast, then the algorithm might end up in one of the local maximums. On the other hand, if the temperature falls too slowly, then the algorithm does a lot of bad moves and ends up too far away from a solution. Ideally, the temperature should drop fast on the beginning and slow down later on. For that reason, a linear temperature function is not ideal for the simulated annealing.\\
+In order to make the timeToTemperature() independent of the function implemented by T(t), this method loops through time until it reaches the desired temperature (or lower).
+
+\item The algorithm works most of the time for small numbers of queens and a exponential function, as shown in Table \ref{table:solvedHC3}. Since the algorithm works well for small ($<= 16$) number of queens, even with low starting temperatures, those should be used to do run the algorithm. However, when the number of queens is big, higher starting temperatures are preferable, since one can get more than double the chance of success. Note that higher starting temperatures means more time taken to run the algorithm. 
+
+\item The program doesn't work well for larger problem sizes because a high number of queens means that picking the right queen to move to a good position is less likely to happen. 
+
+\begin{table}[ht]
+	\resizebox{1.0\textwidth}{!}{\begin{minipage}{\textwidth}
+    \centering
+	\begin{tabular}{ c | c | c}
+  		starting temperature & number of queens &solved puzzles\\ \hline
+  		10 & 4 & 100.0\% \\
+        10 & 8 & 91.5\% \\
+        10 & 16 & 44.9\% \\
+  		10 & 32 & 1.7\% \\
+        \hline
+  		10000 & 4 & 100.0\% \\
+        10000 & 8 & 92.0\% \\
+  		10000 & 16 & 40.9\% \\
+        10000 & 32 & 2.2\% \\
+        \hline
+        10000000 & 4 & 100.0\% \\
+        10000000 & 8 & 92.3\% \\
+  		10000000 & 16 & 45.3\% \\
+        10000000 & 32 & 3.6\% \\
+	\end{tabular}
+	\caption[Table caption text]{Percentage of solved puzzles vs number of queens with varying starting temperatures.}
+\label{table:solvedHC3}
+\end{minipage} }
+\end{table}
+
+\end{enumerate}
+
+\subsection*{Genetic Algorithm}
+
+\begin{enumerate}
+\item The genetic algorithm used in this program was implemented with a population size of 1000 after testing a few other possibilities. A larger population would mean longer time to process run it, while a smaller size would often give worse results. The algorithm uses all forms of mutation in a random way so as to be able to create a wide range of different offsprings. The rate of such mutations ($\frac{1}{\text{population size}}$) was also determined empirically and seems to work well, since it usually produces at least 1 mutated child. This allows the algorithm to escape local maximums without completely throwing it off track. In order to choose which individuals to reproduce, the algorithm tends to picks them randomly, but fitter individuals have better probabilities of being chosen. The chance of a certain individual to be picked is given by $\frac{\text{fitness}}{\text{total fitness}}$.\\
+The genetic algorithm works extremely well for a low number of queens, being able to solve the problem with a very high rate of success with little computation time, as shown in Table \ref{table:solvedHC4}. However, the algorithm scales horribly with higher complexity, specially if the limit of iterations depends on the number of queens. Not only does it take a very long time to run, but it also rarely finds a solution. For that reason, the simulated annealing ends up being a much better option, since it provides much better success rate and does not take so long to run.
+
+\begin{table}[ht]
+	\resizebox{1.0\textwidth}{!}{\begin{minipage}{\textwidth}
+    \centering
+	\begin{tabular}{ c | c | c}
+  		number of queens & solved puzzles & time$^{(1)}$\\ \hline
+  		4 & 100\% & 2.999s\\
+        6 & 99\% & 8.703s\\
+  		8 & 100\% & 18.329s\\
+        11 & 49\% & 2m17.266s\\
+        12 & 45\% & 2m13.136s\\
+  		16 & 6\% & 3m8.636s\\
+        32 & 0\% & 3m40.740s\\
+	\end{tabular}
+	\caption[Table caption text]{Percentage of solved puzzles vs number of queens using the genetic algorithm. (1) Time needed to run the algorithm 100 times using a maximum of 100 iterations per run.}
+\label{table:solvedHC4}
+\end{minipage} }
+\end{table}
+\end{enumerate}
+
+\subsection*{Game of Nim}
+
+\begin{enumerate}[a)]
+\item Assuming optimal play, Max will win the games starting with 3, 4 and 6 matches, while Min will win the one starting with 5 matches. For the first two games, starting with 3 and 4 matches, Max can win by taking 2 and 3 matches respectively. For the third game, however, there is no way for Max to win, since whatever move he makes Min will receive a winning hand: by taking 1 match, Min can take 3 later and win; by taking 2 matches, Min can take 2 matches and win; and by taking 3 matches, Min can take 1 match and win. Finally, for a game starting with 6 matches, Max can win by taking 1 match and Min will receive a losing hand (with 5 matches), as shown before. 
+
+\addtocounter{enumi}{1}
+
+\item The algorithm takes a very long time to process the games starting with 40 and 50 matches because it ends up simulating the game for the same states over and over again. As so, a transposition table, a table where the return value of analyzed states are kept, really speeds up the process. After enhancing the algorithm with a transposition table it is definitely much faster, giving almost instant results, even for numbers much larger than 50.
+
+\end{enumerate}
+
+\section*{Programming} 
+%The programming part follows the same template used during ADinC and Imperative Programming
+\subsection*{N Queens Problem}
+\subsubsection*{Program description}
+
+The N Queens problem consists of positioning queens on a N x N board in such a way that none of them collide (according to the chess rules). In order to solve this problem a few different methods were implemented, allowing for an easy way to compare them. 
+
+\subsubsection*{Problem analysis}
+Finding the correct positions of the n queens is no easy task. In fact, even for small numbers such as 6 and 7, the problem is non-trivial. The methods implemented in the program, however, can tackle this problem for a large number of queens. The program implements 4 algorithms to do so: random search, hill climbing, simulated annealing and a genetic algorithm.
+
+\subsubsection*{Program design}
+The user is able to pick which method is used to try to find a solution. Aside from that, the user is also prompted to determine the number of queens used. Because the algorithms have a chance of failing to find a solution, the program also supports an optional argument when the program is executed to determine the number of times it will run the desired algorithm. This feature also proved to be useful when comparing the different algorithms.\\
+The hill climbing part of the algorithm was designed with repetition in mind, since it often did not find a solution, specially for large values of n. By resetting the board and trying again, the algorithm was able to greatly improve it's success rate.\\
+For the simulated annealing, a lot of schedule functions were tested until a decision was made to lower the temperature by 5\% per iteration. This exponential function has the advantages discussed in the theory part of this report and, as such, had a much better performance than other functions.\\
+In order to implement the genetic algorithm a lot of new functions had to be created. Not only were the select, mutate and reproduce functions, which are essential to the genetic algorithm, needed, but also functions related to the sorting of a population. A new type was also created to make such functions easier to implement.
+
+\subsubsection*{Program evaluation}
+
+The program works rather well for values of $n <= 32$, depending on the algorithm chosen. However, for bigger values it seems as though the program rarely finds a solution. 
+
+\subsubsection*{Program output}
+
+\lstinputlisting[caption={Output for n = 4 using Hill Climbing},label={out4HC}]{src/nqueens4HC.txt}
+
+\lstinputlisting[caption={Output for n = 4 using Simulated Annealing},label={out4SA}]{src/nqueens4SA.txt}
+
+\lstinputlisting[caption={Output for n = 4 using Genetic Algorithm},label={out4GA}]{src/nqueens4GA.txt}
+
+\lstinputlisting[caption={Output for n = 16 using Simulated Annealing: the algorithm fails to find a solution this time.},label={out16SA}]{src/nqueensSAfail.txt}
+
+
+\subsubsection*{Program files}
+%copy code files into listings using the \begin{listing} command as follows:
+
+\lstinputlisting[caption={nqueens.c},label={nqueens}]{src/nqueens.c}
+
+\subsection*{Game of Nim}
+\subsubsection*{Program description}
+
+The aim of this program is to simulate the optimal plays of a game of Nim. Nim is a two-player game where the players take turns removing 1, 2 or 3 matches from a pile of $n$ matches, with $n >= 3$. Whoever takes the last match loses the game. The program is designed to work with 
+starting values of up to 100 matches, though it is easy to configure it for more matches.
+
+\subsubsection*{Problem analysis}
+In order to implement the decision making involved in this game, the Negamax algorithm was implemented. The program uses the algorithm to remove the best amount of matches it can so as to win. 
+
+\subsubsection*{Program design}
+The program was based on a Minimax implementation. The Minimax version presented a few flaws which are fixed in the Negamax: repeating code and recursive methods returning different types of data. To fix the first of these issues the Negamax algorithm does a pretty good job because of the essence of the algorithm (the -1 multiplication). The second issue, however, was fixed by creating a new type, Move, to keep the information together. This allowed the recursive method to return the needed information, the move and the evaluation of such move, in a consistent way. The resulting code is much cleaner and easier to understand than the Minimax version.\\
+Because the Negamax algorithm on its own resulted in repeating the same calculations several times, a transposition table was also implemented, greatly improving the program's performance. Moreover, note that the new type created, Move, also helps to store the information in the table in a clean, consistent way.
+
+
+\subsubsection*{Program evaluation}
+
+The program was verified by comparing the output of the Minimax version with the program's output. To do that, a shell script was created to run both programs with values ranging from 3 to 30 and compare the outputs. The script prints a message each time the outputs are different.\\
+By running the script in Listing \ref{checkNim} no output was given, so the program works as desired, at least for the values tested. In terms of efficiency, the program also gives great results: even starting with 100 matches the output appears instantaneously on the screen.
+
+\lstinputlisting[caption={checkNim.sh},label={checkNim}]{src/checkNim.sh}
+
+
+\subsubsection*{Program output}
+
+The program outputs the simulation of a game using optimal plays. The following outputs are simulations of two games: one where Max wins (Listing \ref{out10}) and one where it loses (Listing \ref{out13}).
+
+\lstinputlisting[caption={Output for n = 10},label={out10}]{src/out10.txt}
+
+\lstinputlisting[caption={Output for n = 13},label={out13}]{src/out13.txt}
+
+
+
+
+\subsubsection*{Program files}
+%copy code files into listings using the \begin{listing} command as follows:
+\subsubsection*{nimNegamax.c}
+\lstinputlisting[caption={nimNegamax.c},label={negamax}]{src/nimNegamax.c}
+
+
+
+\end{document}

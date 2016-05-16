@@ -251,9 +251,10 @@ void hillClimbing(int limit) {
 
   printState();
 
-  // Try again using the final state as initial state?
+  // Try again, reseting the board
   if (eval != optimum && limit > 0) {
     initiateQueens(1);
+    printf("Trying again...\n");
     hillClimbing(limit - 1);
   }
 
@@ -530,25 +531,8 @@ void geneticAlgorithm() {
 int main(int argc, char *argv[]) {
   int algorithm;
   int repeat = 1;
-  int v[11] = {5, 10, 20, 20, 46, 48, 67, 79, 93, 96, 100};
   int r;
   initializeRandomGenerator();
-
-  // Board x, y, z;
-  // Board boards[10];
-  // populate(&x);
-  // populate(&y);
-  // nqueens = 11;
-  // qsort(boards, 10, sizeof(Board), cmpfunc);
-  // isSorted(boards, 10);
-
-  // insertSorted(boards, 10, x);
-  // isSorted(boards, 10);
-
-  // insertSorted(boards, 10, y);
-  // isSorted(boards, 10);
-
-  // printf("Sorting working\n");
 
   if (argc == 2)
     repeat = atoi(argv[1]);
@@ -569,8 +553,8 @@ int main(int argc, char *argv[]) {
   for (int i = 0; i < repeat; i++) {
     initiateQueens(1);
     
-    // printf("\nInitial state:");
-    // printState();
+    printf("\nInitial state:");
+    printState();
 
     switch (algorithm) {
     case 1: randomSearch();       break;

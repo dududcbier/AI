@@ -3,6 +3,7 @@
 
 #define MAX 0
 #define MIN 1
+#define MAXMATCHES 100
 
 #define INFINITY 9999999
 
@@ -11,7 +12,7 @@ typedef struct move {
   int valuation;
 } Move;
 
-Move transpTable[2][101];
+Move transpTable[2][MAXMATCHES + 1];
 
 Move negaMax(int state, int turn) {
   Move best;
@@ -39,7 +40,6 @@ Move negaMax(int state, int turn) {
     transpTable[turn][state] = best;
   }
   else {
-    // printf("HELLO\n");
     best = transpTable[turn][state];
   }
   return best;
