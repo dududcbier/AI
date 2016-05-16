@@ -11,6 +11,8 @@ typedef struct move {
   int valuation;
 } Move;
 
+Move transpTable[2][101];
+
 Move negaMax(int state, int turn) {
   Move best;
   best.valuation = INFINITY;
@@ -21,23 +23,43 @@ Move negaMax(int state, int turn) {
     return best;
   }
 
-  for (int move = 1; move <= 3; move++) {
-    if (state - move > 0) {
-      Move m = negaMax(state - move, 1 - turn);
-      if (m.valuation != INFINITY)
-        m.valuation *= -1;
+  if (transpTable[turn][state].move == -1){
+    for (int move = 1; move <= 3; move++) {
+      if (state - move > 0) {
+        Move m = negaMax(state - move, 1 - turn);
+        if (m.valuation != INFINITY)
+          m.valuation *= -1;
 
-      if (m.valuation < best.valuation) {
-        best.valuation = m.valuation;
-        best.move = move;
+        if (m.valuation < best.valuation) {
+          best.valuation = m.valuation;
+          best.move = move;
+        }
       }
     }
+    transpTable[turn][state] = best;
+  }
+  else {
+    // printf("HELLO\n");
+    best = transpTable[turn][state];
   }
   return best;
 }
 
+void initialize(int state){
+  Move def;
+  def.move = -1;
+  def.valuation = -1;
+  for (int i = 0; i <= state; i++){
+    transpTable[MAX][i] = def;
+    transpTable[MIN][i] = def;
+  }
+}
+
 void playNim(int state) {
   int turn = 0;
+  
+  initialize(state);
+
   while (state != 1) {
     Move action = negaMax(state, turn);
     printf("%d: %s takes %d\n", state, 
