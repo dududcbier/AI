@@ -1,0 +1,49 @@
+variables:
+X0, X1, X2, X3, X4, X5, X6, X7, X8, X9, X10, X11 : integer;
+
+domains:
+X0, X1, X2, X3, X4, X5, X6, X2, X7 <- [0..9];
+X8, X9, X10, X11 <- [0..0, 1..1];
+
+constraints:
+(X3 + X1) mod 10 = X7;
+(X3 + X1) div 10 = X8;
+(X8 + X2 + X6) mod 10 = X1;
+(X8 + X2 + X6) div 10 = X9;
+(X9 + X1 + X5) mod 10 = X2;
+(X9 + X1 + X5) div 10 = X10;
+(X10 + X0 + X4) mod 10 = X5;
+(X10 + X0 + X4) div 10 = X11;
+X11 = X4;
+X4 <> 0;
+X0 <> 0;
+X0 <> X1;
+X0 <> X2;
+X0 <> X3;
+X0 <> X4;
+X0 <> X5;
+X0 <> X6;
+X0 <> X7;
+X1 <> X2;
+X1 <> X3;
+X1 <> X4;
+X1 <> X5;
+X1 <> X6;
+X1 <> X7;
+X2 <> X3;
+X2 <> X4;
+X2 <> X5;
+X2 <> X6;
+X2 <> X7;
+X3 <> X4;
+X3 <> X5;
+X3 <> X6;
+X3 <> X7;
+X4 <> X5;
+X4 <> X6;
+X4 <> X7;
+X5 <> X6;
+X5 <> X7;
+X6 <> X7;
+
+solutions:all

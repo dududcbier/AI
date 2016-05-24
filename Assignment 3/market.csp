@@ -1,0 +1,16 @@
+#The set of variables of the CSP
+variables:
+	O,G,M : integer;
+
+#Here the domains are defined
+domains:
+	O,G,M <- [0..250];
+
+#Here are the constraints:
+constraints:
+	O + G + M = 100;
+	O*88 + G*99 + M*102 = 10000;
+
+# Here you can specify in how many solutions
+# you are interested (all, 1, 2, 3, ...)  
+solutions: all

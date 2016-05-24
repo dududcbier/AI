@@ -1,0 +1,22 @@
+#The set of variables of the CSP
+variables:
+	A,B,C,D,E : integer;
+
+#Here the domains are defined
+domains:
+	A,B,C,D,E <- [1..4];
+
+#Here are the constraints:
+constraints:
+	B >= A;
+	C <> A;
+	A > D;
+	D > E;
+	C > E;
+	B <> C;
+	C <> D;
+	C <> D + 1;
+# Here you can specify in how many solutions
+# you are interested (all, 1, 2, 3, ...)  
+solutions: all
+
