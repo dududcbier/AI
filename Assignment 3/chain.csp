@@ -33,7 +33,7 @@ constraints:
 	W=X;
 	X=Y;
 	Y=Z;
-	Z=42;
+	N = 42;
 # Here you can specify in how many solutions
 # you are interested (all, 1, 2, 3, ...)  
 solutions: all

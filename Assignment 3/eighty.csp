@@ -1,0 +1,29 @@
+#The set of variables of the CSP
+variables:
+	T,W,E,N,Y,F,I,O,G,H,carry[4] : integer;
+
+#Here the domains are defined
+domains:
+	T,W,E,N,Y,F,I,O,G,H <- [0..9];
+	carry[0],carry[1],carry[2] <- [0..3];
+	carry[3] <- [0..2];
+
+#Here are the constraints:
+constraints:
+	Y + Y + E + E = Y + 10 * carry[0];
+	carry[0] + T + T + N + N = T + 10 * carry[1];
+	carry[1] + N + F + I + O = H + 10 * carry[2];
+	carry[2] + E + I + N = G + 10 * carry[3];
+	carry[3] + W + F = I + 10;
+	1 + T = E;
+	T <> 0;
+	F <> 0;
+	N <> 0;
+	O <> 0;
+	E <> 0;
+	alldiff(T,W,E,N,Y,F,I,O,G,H);
+	
+# Here you can specify in how many solutions
+# you are interested (all, 1, 2, 3, ...)  
+solutions: all
+
