@@ -1,0 +1,28 @@
+#The set of variables of the CSP
+variables:
+	U,N,E,F,O,Z,carry[3] : integer;
+
+#Here the domains are defined
+domains:
+	U,N,E,F,O,Z <- [0..9];
+	carry <- [0, 1, 2];
+
+#Here are the constraints:
+constraints:
+	(F + N + N) mod 10 = E;
+	(F + N + N) div 10 = carry[0];
+	(carry[0] + U + U + U) mod 10 = Z;
+	(carry[0] + U + U + U) div 10 = carry[1];
+	(carry[1] + E) mod 10 = N;
+	(carry[1] + E) div 10 = carry[2];
+	(carry[2] + N) mod 10 = O;
+	(carry[2] + N) div 10 = 0;
+	N <> 0;
+	O <> 0;
+	U <> 0;
+	alldiff(U,N,E,F,O,Z);
+	
+# Here you can specify in how many solutions
+# you are interested (all, 1, 2, 3, ...)  
+solutions: all
+

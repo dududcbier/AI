@@ -1,0 +1,39 @@
+#The set of variables of the CSP
+variables:
+	A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z : integer;
+
+#Here the domains are defined
+domains:
+	A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z <- [0..99];
+
+#Here are the constraints:
+constraints:
+	A=B;
+	B=C;
+	C=D;
+	D=E;
+	E=F;
+	F=G;
+	G=H;
+	H=I;
+	I=J;
+	J=K;
+	K=L;
+	L=M;
+	M=N;
+	N=O;
+	O=P;
+	P=Q;
+	Q=R;
+	R=S;
+	S=T;
+	T=U;
+	U=V;
+	V=W;
+	W=X;
+	X=Y;
+	Y=Z;
+	Z=42;
+# Here you can specify in how many solutions
+# you are interested (all, 1, 2, 3, ...)  
+solutions: all
