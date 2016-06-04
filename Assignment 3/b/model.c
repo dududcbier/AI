@@ -417,13 +417,14 @@ int main(int argc, char *argv[]) {
   showExpSet("INFER", inferSize, infer);
   printf("\n");
 
-  evaluateRandomModel(cntidents);
+  // evaluateRandomModel(cntidents);
+  //printf("\n");
 
-  printf("\n");
   if (checkAllModels(cntidents)) {
     printf("KB entails INFER\n");
   } else {
     printf("KB does not entail INFER:\n");
+    printf("Counter example: ");
     showModel(cntidents);
   }
 
