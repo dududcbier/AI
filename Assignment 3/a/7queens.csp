@@ -1,16 +1,16 @@
 #The set of variables of the CSP
 variables:
-	queens[4] : integer;
+	queens[7] : integer;
 
 #Here the domains are defined
 domains:
-	queens <- [0..3];
+	queens <- [0..6];
 
 #Here are the constraints:
 constraints:
 	alldiff(queens); #different rows
-	forall(i in [0..3])
-		forall(j in [i + 1..3])
+	forall(i in [0..6])
+		forall(j in [i + 1..6])
 			abs(queens[i] - queens[j]) <> abs(i - j);
 		end
 	end

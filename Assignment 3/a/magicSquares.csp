@@ -1,0 +1,21 @@
+#The set of variables of the CSP
+variables:
+	square[4][4] : integer;
+
+#Here the domains are defined
+domains:
+	square <- [1..16];
+
+#Here are the constraints:
+constraints:
+	alldiff(square);
+	forall(i in [0..3])
+		sum(square[i]) = 34; #rows
+		square[0][i] + square[1][i] + square[2][i] + square[3][i] = 34; #columns
+	end
+	square[0][0] + square[1][1] + square[2][2] + square[3][3] = 34; #diagonal 1
+	square[0][3] + square[1][2] + square[2][1] + square[3][0] = 34; #diagonal 2
+
+# Here you can specify in how many solutions
+# you are interested (all, 1, 2, 3, ...)  
+solutions: all

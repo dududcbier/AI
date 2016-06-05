@@ -10,17 +10,12 @@ domains:
 
 #Here are the constraints:
 constraints:
-	(Y + Y + E + E) mod 10 = Y;
-	(Y + Y + E + E) div 10 = carry[0];
-	(carry[0] + T + T + N + N) mod 10 = T;
-	(carry[0] + T + T + N + N) div 10 = carry[1];
-	(carry[1] + N + F + I + O) mod 10 = H;
-	(carry[1] + N + F + I + O) div 10 = carry[2];
-	(carry[2] + E + I + N) mod 10 = G;
-	(carry[2] + E + I + N) div 10 = carry[3];
-	(carry[3] + W + F) mod 10 = I;
-	(carry[3] + W + F) div 10 = 1;
-	(1 + T) mod 10 = E;
+	Y + Y + E + E = Y + 10 * carry[0];
+	carry[0] + T + T + N + N = T + 10 * carry[1];
+	carry[1] + N + F + I + O = H + 10 * carry[2];
+	carry[2] + E + I + N = G + 10 * carry[3];
+	carry[3] + W + F = I + 10;
+	1 + T = E;
 	T <> 0;
 	F <> 0;
 	N <> 0;

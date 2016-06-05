@@ -1,0 +1,15 @@
+variables:
+prime[20] : integer;	
+
+domains:
+prime <- [2..74];
+
+constraints:
+forall(i in [0..18])
+	prime[i] > prime[i + 1];
+	forall(j in [i + 1..19])
+		prime[i] mod prime[j] <> 0;
+	end	
+end
+
+solutions:1
