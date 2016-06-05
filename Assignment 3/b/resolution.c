@@ -10,12 +10,14 @@
 
 #define FALSE 0
 #define TRUE  1
+#define CLAUSEMAXSIZE 1024
 
 typedef unsigned int bitset;
 
 typedef struct clause {
   bitset positive;   /* bitset of positive symbols in clause */
   bitset negative;   /* bitset of negative symbols in clause */
+  int parents[2];
 } clause;
 
 typedef struct clauseSet {
@@ -246,6 +248,14 @@ void resolveClauses(clause a, clause b, clauseSet *rsv) {
   crossClauses(b, a, rsv);
 }
 
+void setParents(clauseSet *set, int parent1, int parent2){
+  for (int i = 0; i < set->size; i++){
+    set->clauses[i].parents[0] = parent1;
+    set->clauses[i].parents[1] = parent2;
+  }
+
+}
+
 void resolution(clauseSet *kb) {
   /* Extends the kb with rules that can be inferred by resolution.
    * The function returns, as soon as it inferred the empty 
@@ -260,6 +270,9 @@ void resolution(clauseSet *kb) {
       for (j=i+1; j < kb->size; j++) {
         clauseSet resolvents;
       	resolveClauses(kb->clauses[i], kb->clauses[j], &resolvents);
+
+        setParents(&resolvents, i, j);
+
       	unionOfClauseSets(&inferred, resolvents);
       	freeClauseSet(resolvents);
       }
@@ -272,29 +285,49 @@ void resolution(clauseSet *kb) {
   }
 }
 
+char* readClause(char *c){
+  scanf("[");
+  scanf("%[^]]", c);
+  scanf("]");
+  return c;
+}
+
 void init(clauseSet *s) {
-  /* makes KB with clauses: {~a,~b}, {a,~b,~c,~d}, {b,~d}, {c,~d} */
   clause c;
+  char *clauseString;
+  char ch;
+
+  clauseString = malloc(sizeof(char) * CLAUSEMAXSIZE);
   makeEmptyClauseSet(s);
-  /* clause {~a,~b} */
-  makeClause(&c, "~a,~b");
-  insertInClauseSet(c, s);
-  /* clause , {a,~b,~c,~d} */
-  makeClause(&c, "a,~b,~c,~d");
-  insertInClauseSet(c, s);
-  /* clause {b,~d} */
-  makeClause(&c, "b,~d");
-  insertInClauseSet(c, s);
-  /* clause , {c,~d} */
-  makeClause(&c, "c,~d");
-  insertInClauseSet(c, s);
-  /* add clause {d}: negation of goal ~d */
-  makeClause(&c, "d");
-  insertInClauseSet(c, s);
+
+  scanf("KB=[");
+  ch = getchar();
+  while (ch == ',' || ch == '['){
+    readClause(clauseString);
+    makeClause(&c, clauseString);
+    insertInClauseSet(c, s);
+    ch = getchar();
+  }
+
+  /* Set empty parents */
+  setParents(s, -1, -1);
+  free(clauseString);
+    
 }
 
 void recursivePrintProof(int idx, clauseSet s) {
-  printf("IMPLEMENT THE ROUTINE recursivePrintProof yourself!\n");
+  int *parentsIdx = s.clauses[idx].parents;
+  if (parentsIdx[0] != -1 && parentsIdx[1] != -1){
+    recursivePrintProof(parentsIdx[0], s);
+    recursivePrintProof(parentsIdx[1], s);
+
+    printClause(s.clauses[idx]);
+    printf(" is inferred from ");
+    printClause(s.clauses[parentsIdx[0]]);
+    printf(" and ");
+    printClause(s.clauses[parentsIdx[1]]);
+    printf(".\n");
+  }
 }
 
 void printProof(clauseSet s) {
