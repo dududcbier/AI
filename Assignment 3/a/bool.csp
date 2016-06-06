@@ -1,6 +1,6 @@
 #The set of variables of the CSP
 variables:
-	x[3] : integer;
+	x[5] : integer;
 
 #Here the domains are defined
 domains:
@@ -8,8 +8,14 @@ domains:
 
 #Here are the constraints:
 constraints:
-	max(x1,x2,x3) = 1;
-
+	max(x[0],max(x[1],(x[2] + 1) mod 2)) = 1; # x1 v x2 v ~x3
+	max((x[0] + 1) mod 2, max((x[1] + 1) mod 2,(x[3] + 1) mod 2)) = 1; #~x1 v ~x2 v ~x4
+	max(x[0], max((x[1] + 1) mod 2,(x[4] + 1) mod 2)) = 1; # x1 v ~x2 v ~x5
+	max((x[0] + 1) mod 2, max(x[2],(x[3] + 1) mod 2)) = 1; # ~x1 v x3 v ~x4
+	max(x[0], max((x[2] + 1) mod 2,x[4])) = 1; # x1 v ~x3 v x5
+	max(x[0], max((x[3] + 1) mod 2,x[4])) = 1; # x1 v ~x4 v x5
+	max(x[1], max(x[3],x[4])) = 1; # x2 v x4 v x5
+	max((x[2] + 1) mod 2, max(x[3],(x[4] + 1) mod 2)) = 1; # ~x3 v x4 v ~x5
 
 # Here you can specify in how many solutions
 # you are interested (all, 1, 2, 3, ...)  

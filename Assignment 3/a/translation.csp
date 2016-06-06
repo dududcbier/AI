@@ -1,0 +1,17 @@
+variables:
+X0, X1, X2, X3, X4 : integer;
+
+domains:
+X0, X1, X2, X3, X4 <- [0..1];
+
+constraints:
+max(X0,max(X1,(X2 + 1) mod 2)) = 1;
+max((X0 + 1) mod 2,max((X1 + 1) mod 2,(X3 + 1) mod 2)) = 1;
+max(X0,max((X1 + 1) mod 2,(X4 + 1) mod 2)) = 1;
+max((X0 + 1) mod 2,max(X2,(X3 + 1) mod 2)) = 1;
+max(X0,max((X2 + 1) mod 2,X4)) = 1;
+max(X0,max((X3 + 1) mod 2,X4)) = 1;
+max(X1,max(X3,X4)) = 1;
+max((X2 + 1) mod 2,max(X3,(X4 + 1) mod 2)) = 1;
+
+solutions:all
