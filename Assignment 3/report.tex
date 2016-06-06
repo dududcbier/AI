@@ -1,0 +1,383 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{enumerate}
+\usepackage{color}
+\usepackage{amsmath}
+\usepackage{makecell}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{language=C,
+  numbers=left,
+  stepnumber=1,    
+  firstnumber=1,
+  numberfirstline=true
+  aboveskip=5mm,
+  belowskip=5mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true
+  tabsize=3
+}
+
+\title{Artificial Intelligence 1 \\ Lab 3}%Update the lab (assignment number)
+\author{Eduardo Bier s3065979 \& Auke Roorda s2973782 \\ CS1} %Change the names and fill in the student numbers and the group name (AI1/AI2/CS1 etc)
+\date{June 2, 2016}%Update the date
+
+\begin{document}
+
+\maketitle
+
+\section*{Theory Lab 3a}
+\subsection*{1.  Solving a small set of equations}
+The solver is able to find the one and only solution to the set of equations:\linebreak A = 3, B = 7, C = 2. The best propagation technique to be used for this problem is arc consistency. Since every variable is connected to each other, making the problem arc consistent has a huge impact on reducing the number of visited states. The available heuristics do not improve the performance of the solver, since all variables appear the same amount of times on each constraint and have the same amount of possible values. The code can be found on Listing \ref{42}.
+
+\lstinputlisting[caption={42.csp},label={42}]{42.txt}
+
+\subsection*{2.  Market}
+The problem was formulated taking into account the fact that the solver only supports integers. As so, instead of using euros to represent the money related constraints, cents were used. Note that this problem is very similar to the previous problem, since it boils down to solving a small set of (5) equations. As so, the heuristics, propagation techniques and reasons for using them were exactly the same. There are 5 different solutions to this problem, as shown below:\\
+
+Solution 1:
+O = 	1, 
+G = 	62,
+M = 	37 \\
+
+Solution 2:
+O = 	4, 
+G = 	48, 
+M = 	48 \\
+
+Solution 3:
+O = 	7, 
+G = 	34, 
+M = 	59 \\
+
+Solution 4:
+O = 	10, 
+G = 	20, 
+M = 	70 \\
+
+Solution 5:
+O = 	13, 
+G = 	6, 
+M = 	81 \\
+
+The code can be found on Listing \ref{market}.
+
+\lstinputlisting[caption={market.csp},label={market}]{market.txt}
+
+\subsection*{3.   Chain of trivial equations}
+
+As expected, the number of solutions of the equations is 100, one for each value in the variable's domain. By adding the new constraint A = 42, the system now only has 1 solution (every variable equals 42) and the program visits 2502 states. By changing that constraint to Z = 42, the same solution is reached. The number of states, however, is greatly reduced to 27.	This happens because Z does not depend on any other variable, like A does. So when we write A = 42, we still have to check the values of B, C, D, ..., Z before finding a solution, whereas with Z = 42, we know right away that Z is actually 42 and therefore all other letters are too. No heuristics and propagation techniques help improve the performance of this problem because all variables appear on the same number of constraints. The code can be found on Listing \ref{chain}.
+
+\lstinputlisting[caption={chain.csp},label={chain}]{chain.txt}
+
+\subsection*{4.   Constraint Graph}
+Both forward checking and arc consistency do a great job at solving the problem, but arc consistency ends up being better because of the structure of the problem. Every variable is connected to another one on each constraint. The solutions for the constraint graph are: \\\\
+Solution 1:
+A = 	3,
+B = 	3, 
+C = 	4, 
+D = 	2, 
+E = 	1 \\
+
+Solution 2:
+A = 	4, 
+B = 	4, 
+C = 	2, 
+D = 	3, 
+E = 	1 \\ 
+
+The code can be found on Listing \ref{graph}.
+
+\lstinputlisting[caption={graph.csp},label={graph}]{graph.txt}
+
+\subsection*{5.   Cryptarithmetic Puzzle}
+Like in the previous problems, arc consistency is the best propagation technique to be used in this problem. The minimum remaining values heuristic also improves the performance of the solver, since now the number of possibilities of values of the variables is very different. By picking the one with the least values the solver ends up visiting less states, since it'll need to test less values. The other problems have 1, 1 and 0 solutions, respectively.
+The code can be found on Listings \ref{cryptarithmetic}, \ref{onze}, \ref{eighty} and \ref{truth}.
+
+\lstinputlisting[caption={cryptarithmetic.csp},label={cryptarithmetic}]{cryptarithmetic.txt}
+
+\lstinputlisting[caption={onze.csp},label={onze}]{onze.txt}
+
+\lstinputlisting[caption={eighty.csp},label={eighty}]{eighty.txt}
+
+\lstinputlisting[caption={truth.csp},label={truth}]{truth.txt}
+
+
+\subsection*{6. 20 First Primes}
+By creating an array to put the prime numbers in descending order, no flags were needed to be set for the problem to be solved in a reasonable amount of time. The solution given solves the problem visiting just 21 states and even works (with the proper adjustments) for a higher number of prime numbers. The reason it works so well is because of  how the csp solver tries to assign values to the variables: it starts at the end of the array with the lowest value of the domain. It's therefore able to assign the right value for the smallest primes really quickly and finds the prime numbers in order. As so, the algorithm performs extremely well even with larger domains. Note that this only works because we only want to find 1 solution to the problem.The code can be found on Listing \ref{primes}.
+
+\lstinputlisting[caption={primes.csp},label={primes}]{primes.txt}
+
+\subsection*{7. Sudoku}
+The solver performed well on both solutions, but visited almost 5 times the amount of states for the second puzzle. This is probably due to the fact that there are more numbers already in place for the first puzzle. Sudoku puzzles work well with th e minimum remaining value heuristic, since you really limit your search space by choosing the right tile. The arc consistency was once again the best propagation method, although forward chaining also did a pretty good job at it. The performance is further improved by using the flag -iconst 2.
+The solutions for the Sudoku puzzles are give by tables \ref{table:sudoku1} and \ref{table:sudoku2}\\
+
+The code can be found on Listing \ref{sudoku}.
+
+\lstinputlisting[caption={sudoku.csp},label={sudoku}]{sudoku.txt}
+
+\begin{table}[h]
+	\resizebox{1.0\textwidth}{!}{\begin{minipage}{\textwidth}
+    \centering
+	\begin{tabular}{| c | c | c || c | c | c || c | c | c |}
+    \hline
+  	9 & 1 & 8 & 6 & 3 & 2 & 4 & 5 & 7 \\ \hline
+	2 & 4 & 6 & 5 & 8 & 7 & 3 & 1 & 9 \\ \hline
+	5 & 7 & 3 & 9 & 1 & 4 & 2 & 8 & 6 \\ \hline \hline
+	8 & 3 & 4 & 2 & 6 & 9 & 1 & 7 & 5 \\ \hline
+	6 & 2 & 9 & 1 & 7 & 5 & 8 & 3 & 4 \\ \hline
+	1 & 5 & 7 & 3 & 4 & 8 & 9 & 6 & 2 \\ \hline \hline
+	4 & 8 & 2 & 7 & 5 & 1 & 6 & 9 & 3 \\ \hline
+	7 & 6 & 1 & 4 & 9 & 3 & 5 & 2 & 8 \\ \hline
+	3 & 9 & 5 & 8 & 2 & 6 & 7 & 4 & 1 \\ \hline
+	\end{tabular}
+	\caption[Table caption text]{First sudoku puzzle solved}
+\label{table:sudoku1}
+\end{minipage} }
+\end{table}
+
+\begin{table}[h]
+	\resizebox{1.0\textwidth}{!}{\begin{minipage}{\textwidth}
+    \centering
+	\begin{tabular}{| c | c | c || c | c | c || c | c | c |}
+    \hline
+	8 & 3 & 9 & 4 & 6 & 5 & 7 & 1 & 2 \\ \hline
+	1 & 4 & 6 & 7 & 8 & 2 & 9 & 5 & 3 \\ \hline
+	7 & 5 & 2 & 3 & 9 & 1 & 4 & 8 & 6 \\ \hline \hline
+	3 & 9 & 1 & 8 & 2 & 4 & 6 & 7 & 5 \\ \hline
+	5 & 6 & 4 & 1 & 7 & 3 & 8 & 2 & 9 \\ \hline
+	2 & 8 & 7 & 6 & 5 & 9 & 3 & 4 & 1 \\ \hline \hline
+	6 & 2 & 8 & 5 & 3 & 7 & 1 & 9 & 4 \\ \hline 
+	9 & 1 & 3 & 2 & 4 & 8 & 5 & 6 & 7 \\ \hline
+	4 & 7 & 5 & 9 & 1 & 6 & 2 & 3 & 8 \\ \hline
+	\end{tabular}
+	\caption[Table caption text]{Second sudoku puzzle solved}
+\label{table:sudoku2}
+\end{minipage} }
+\end{table}
+
+\subsection*{8. N Queens problem}
+The N queens problem is best solved using the arc consistency propagation technique because of the high degree of connection between the variables. The number of solutions for each problem is given by table \ref{table:nqueens}.
+
+\begin{table}[h]
+	\resizebox{1.0\textwidth}{!}{\begin{minipage}{\textwidth}
+    \centering
+	\begin{tabular}{c | c}
+    nQueens & Solutions \\ \hline
+    4 & 2\\
+    5 & 16\\
+    6 & 4\\
+    7 & 40\\
+    8 & 92\\
+	\end{tabular}
+	\caption[Table caption text]{Number of solutions for varying values of n.}
+\label{table:nqueens}
+\end{minipage} }
+\end{table}
+
+The code can be found on Listings \ref{4queens}, \ref{5queens}, \ref{6queens}, \ref{7queens} and \ref{8queens}.
+
+\lstinputlisting[caption={4queens.csp},label={4queens}]{4queens.txt}
+\lstinputlisting[caption={5queens.csp},label={5queens}]{5queens.txt}
+\lstinputlisting[caption={6queens.csp},label={6queens}]{6queens.txt}
+\lstinputlisting[caption={7queens.csp},label={7queens}]{7queens.txt}
+\lstinputlisting[caption={8queens.csp},label={8queens}]{8queens.txt}
+
+\subsection*{9. Magic Square}
+The magic square problem is best solved using the -arc and -mrv flags because of the high degree of connection between the variables and because this limits the search space, since by picking the variables with fewest possibilities first we find dead-ends quickly. There are 7040 different solutions for the magic square of size 4. The code can be found on Listing \ref{magicSquares}.
+
+\lstinputlisting[caption={magicSquares.csp},label={magicSquares}]{magicSquares.txt}
+
+\subsection*{10. Boolean satisfiability}
+In order to represent boolean values, the domains of the variables is [0,1]. To make the operation $\vee$ the operation max() was used, while the operation $\wedge$ didn't have to be explicitly described on the .csp file, since each constraint would have to be true anyway. Any of the propagation techniques aligned with any of the heuristics proved to improve the solvers performance in the same way. There are 9 solutions to this problem:
+
+Solution 1  \\
+x = 	0 1 0 0 0 \\
+
+Solution 2  \\
+x = 	1 1 0 0 0 \\
+
+Solution 3 \\
+x = 	1 1 1 0 0 \\
+
+Solution 4 \\
+x = 	1 0 1 1 0 \\
+
+Solution 5 \\
+x = 	0 0 0 0 1 \\
+
+Solution 6 \\
+x = 	1 0 0 0 1 \\
+
+Solution 7 \\
+x = 	1 1 0 0 1 \\
+
+Solution 8 \\
+x = 	0 0 0 1 1 \\
+
+Solution 9 \\
+x = 	1 0 1 1 1\\
+
+The code can be found on Listing \ref{bool}.
+
+\lstinputlisting[caption={bool.csp},label={bool}]{bool.txt}
+
+\section*{Theory Lab 3b} 
+%The programming part follows the same template used during ADinC and Imperative Programming
+\subsection*{Model Checking}
+In order to generate all the possible model values, the model array was viewed as a binary number. The model checking started with the value 0 and, after checking that model, 1 was added to that number. For example, if the model had 5 variables, the initial model would be represented by 00000. After checking that model, we would move to the model 00001, followed by 00010, 00011 and so on, until 00000 was reached again. This ensures that every possible combination is tested by the model checker. The checking itself was done by the already implemented function evaluateExpressionSet(). Note that the inferred expressions were only checked if the model was consistent with the KB. The code can be found on Listing \ref{model}.
+
+\subsection*{Resolution}
+The recursivePrintProof function was implemented by saving the parents of each clause, which were easy to keep track of, since they never change locations on the kb array. As so, only their indexes needed to be kept.\\
+The KB created and query were:
+\begin{lstlisting}
+KB=[[a],[~a,b],[~b,c],[~c,d],[~d,e],[~e,f],[~f,g],[~g,h],[~h,i],[~i,j],
+    [~j,k],[~k,l],[~l,m],[~m,n],[~n,o]]
+query = [o]
+\end{lstlisting}
+Which proved to be true, as shown below:\\
+\begin{lstlisting}
+Proof:
+[b] is inferred from [a] and [~a,b].
+[~b,d] is inferred from [~b,c] and [~c,d].
+[d] is inferred from [b] and [~b,d].
+[~d,f] is inferred from [~d,e] and [~e,f].
+[~f,h] is inferred from [~f,g] and [~g,h].
+[~d,h] is inferred from [~d,f] and [~f,h].
+[h] is inferred from [d] and [~d,h].
+[~h,j] is inferred from [~h,i] and [~i,j].
+[~j,l] is inferred from [~j,k] and [~k,l].
+[~h,l] is inferred from [~h,j] and [~j,l].
+[~l,n] is inferred from [~l,m] and [~m,n].
+[~n] is inferred from [~n,o] and [~o].
+[~l] is inferred from [~l,n] and [~n].
+[~h] is inferred from [~h,l] and [~l].
+[]=FALSE is inferred from [h] and [~h].
+\end{lstlisting}
+The code can be found on Listing \ref{resolution}.
+
+\subsection*{Prolog}
+\begin{enumerate}
+	\item \textbf{Biblical Family}
+	\begin{enumerate}
+		\item The prolog query that determines who's Lot's 			grandfather is:\\
+        \begin{lstlisting}
+?- grandfather(X,lot). 
+		\end{lstlisting}
+		The answer is:
+		\begin{lstlisting}
+X = terach .
+		\end{lstlisting}
+        \item The prolog query that determines all of 				Terach's grandsons is:\\         							\begin{lstlisting}
+?- findall(X,grandfather(terach,X),Grandsons).
+		\end{lstlisting}
+        which returns the result in the list Grandsons: 
+      	\begin{lstlisting}
+Grandsons = [isaac, milcah, yiscah, lot].
+		\end{lstlisting}
+        
+	\end{enumerate}
+    \item \textbf{Arithmetic with natural numbers}
+    \begin{enumerate}
+		\item The query should be:\\
+        
+        \begin{lstlisting}
+plus(s(s(s(0))),s(s(0)),s(s(s(s(s(0)))))).
+		\end{lstlisting}
+        
+        The program returns true.
+        \item The query should be:\\ 
+        \begin{lstlisting}
+plus(s(s(s(0))),s(s(0)),s(s(s(s(s(s(0))))))).
+		\end{lstlisting}
+        The program returns false.
+    \item
+    To add the even and odd predicates, the same recursive approach was taken as with the other predicates. The following code was added to arith.pl:
+    \begin{lstlisting}
+% Even numbers
+even(0).
+even(s(X)) :- odd(X).
+
+% Odd numbers
+odd(0) :- false.
+odd(s(X)) :- even(X).
+	\end{lstlisting}
+   	The code was tested for the values 0, 1, 2 and 3, which returned the expected result.
+    \item 
+        To add the even and odd predicates using the times predicate, the following code was added to arith.pl:
+    \begin{lstlisting}
+% divi2(N,D) is true if D = N / 2
+divi2(N,D) :- times(D,s(s(0)),N).
+divi2(s(N),D) :- times(D,s(s(0)),N).
+	\end{lstlisting}
+   	The code was tested for the values [0,0], [2,1], [3, 1], [1,0] and [5,2], which returned the expected result.
+    
+    \item The query should be \begin{lstlisting}
+pow(s(s(0)),X,s(s(s(s(s(s(s(s(0)))))))))
+\end{lstlisting}
+which returns \begin{lstlisting}
+X = s(s(s(0))).
+\end{lstlisting}
+The predicate log was implemented by the following code:
+\begin{lstlisting}
+log(X,B,N) :- pow(B,N,X).
+\end{lstlisting}
+\item The predicate fib(X,Y) was implemented by the following code:
+\begin{lstlisting}
+fib(0,0).
+fib(s(0),s(0)).
+fib(s(s(X)),Y) :- fib(s(X),F1), fib(X,F2), plus(F1,F2,Y).
+\end{lstlisting}
+\item The predicate power was implemented by the following code: 
+\begin{lstlisting}
+power(X,0,s(0)).
+power(X,s(s(0)),Y) :- times(X, X, Y).
+power(X,N,Y) :- even(N), div2(N, D1), power(X,s(s(0)),P1), power(P1,D1,Y).
+power(X,s(N),Y) :- odd(s(N)), power(X,N,P1), times(X,P1,Y).
+\end{lstlisting}
+This is not an improvement over the direct computation because when the program is looking for a wrong result it ends up getting stuck in a very long (albeit finite) loop, since it calls itself several times and has to check whether the values check out or not. For the cases that are true, however, the code seems to work pretty well.
+	\end{enumerate}
+    
+The code can be found on Listing \ref{arith}.
+    
+\item \textbf{Lists} \\
+The list operations member and concat were implemented in a straight-forward way, by using recursion and the head/tail feature of prolog to go through the list. To implement reverse, the same strategy was used, but an extra list had to be created in order to actually reverse the list, since there was no way to get the last element of the list. The new list was built using concat. To determine whether or not a list was a palindrome, all that had to be done was use the reverse operator with the same list.
+The code can be found on Listing \ref{list}.
+
+\item \textbf{Maze} \\
+In order to represent the maze in prolog, the predicates north(X,Y), south(X,Y), west(X,Y) and east(X,Y) were created, which were true whenever X was north/south/west/east of Y. Finding a path from X to Y  boiled down to finding a path from one of the adjacent squares of X to Y. The recursion ends when the goal is reached. To avoid infinite loops (going back and forth between two opposite directions), a list containing the path so far was kept using the list operations created on the previous exercise.\\
+The query path(a,p) was indeed successful, but path(a,m) returned false, which is in fact the desired behavior. As so, the programs seems to work well.
+The code can be found on Listing \ref{maze}.
+\end{enumerate}
+
+\section{Code}
+
+\subsection*{model.c}
+\lstinputlisting[caption={model.c},label={model}]{model.c}
+
+\subsection*{resolution.c}
+\lstinputlisting[caption={resolution.c},label={resolution}]{resolution.c}
+
+\subsection*{arith.pl}
+\lstinputlisting[caption={arith.pl},label={arith}]{arith.pl}
+
+\subsection*{list.pl}
+\lstinputlisting[caption={list.pl},label={list}]{list.pl}
+
+\subsection*{maze.pl}
+\lstinputlisting[caption={maze.pl},label={maze}]{maze.pl}
+
+\end{document}
